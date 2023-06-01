@@ -354,6 +354,10 @@ a {
             @media (max-width: 1180px) {
                 width: 20em;
             }
+
+            @media (max-width: 992px) {
+                width: 14em;
+            }
         }
 
         &_list {
@@ -467,6 +471,9 @@ a {
                                 width: 14em;
                                 overflow: hidden;
                                 text-overflow: ellipsis;
+                                @media (max-width: 992px) {
+                                    width: 4.5em;
+                                }
                             }
                         }
 
@@ -719,7 +726,7 @@ a {
                 border-radius: 0px 17px 17px 17px;
                 line-height: 1.5em;
                 padding: 0.5em 1em;
-                max-width: 40%;
+                max-width: 22em;
                 width: max-content;
                 color: #7E7979;
                 overflow-wrap: break-word;
