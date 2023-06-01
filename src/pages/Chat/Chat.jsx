@@ -67,9 +67,9 @@ export default function Chat() {
 
 
     const chatList = Object.entries(filterChats).length ?
-        Object.entries(filterChats).map((user) => {
+        Object.entries(filterChats).sort((a,b)=> b[1].date - a[1].date).map((user) => {
             return (
-                <div className={`list_chat_box ${chat.name === user[1]['userInfo'].name && 'list_chat_box_active'}`} key={user[0]} onClick={() => selectUserChat(user[1]['userInfo'].uid, user[0])}>
+                <div className={`list_chat_box ${chat.name && true === user[1]['userInfo'].name && 'list_chat_box_active'}`} key={user[0]} onClick={() => selectUserChat(user[1]['userInfo'].uid, user[0])}>
                     <div className='list_chat_box_message'>
                         <div className='user'>
                             <div className='default_profile'>
@@ -96,16 +96,13 @@ export default function Chat() {
                 No Chat to display
             </Typography>
         </Grid>;
-
-
     const handleSearchChat = (query) => {
-        // if (query === "") return setFilterChats(userChats)
-        // const results = filterChats.filter(chat => {
-        //     if (query === "") return setFilterChats(userChats)
-        //     return console.log(chat);
-        // });
-        
-        // setFilterChats(results)
+        if (query === "") return setFilterChats(userChats)
+        const results = Object.entries(filterChats).filter(chat => {
+            if (query === "") return setFilterChats(userChats)
+            return chat[1]['userInfo'].text.toLowerCase().includes(query.toLowerCase())
+        });
+        setFilterChats(Object.fromEntries(results));
     }
     const handleSearch = (query) => {
         if (query === "") return setFilterUsers(users)
@@ -118,7 +115,7 @@ export default function Chat() {
     const contactList = (filterUsers.length > 0) ?
         filterUsers.map((user) => {
             return (
-                <div className={`list_chat_box ${chat.name === user.name && 'list_chat_box_active'}`} key={user.uid} onClick={() => selectUser(user)}>
+                <div className={`list_chat_box`} key={user.uid} onClick={() => selectUser(user)}>
                     <div className='list_chat_box_message' >
                         <div className='user'>
                             <div className='default_profile'>
@@ -159,6 +156,7 @@ export default function Chat() {
             })
             setMessageList(msgs)
         });
+        toggleTab(1)
     }
 
 
