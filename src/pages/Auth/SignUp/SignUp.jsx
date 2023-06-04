@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Container, Grid } from '@mui/material';
-import Icon from 'react-eva-icons';
 import Logo from '../../../assets/images/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ChatLoading from '../../../components/ChatLoading/ChatLoading';
 import { UserAuth } from '../../../services/auth/authContext';
 import { routes } from '../../../Routes/routes';
-import { updateProfile } from 'firebase/auth';
+import * as eva from 'eva-icons';
 
 export default function SignUp() {
     let navigate = useNavigate();
@@ -54,6 +53,7 @@ export default function SignUp() {
         }
     };
     useEffect(() => {
+        eva.replace();
         error && toast.error(error);
     }, [error]);
 
@@ -75,14 +75,11 @@ export default function SignUp() {
                                     placeholder='Username' name='name'
                                     onChange={handelChange}
                                     value={userInfo.name} />
-                                <Icon
-                                    name="person"
-                                    size="large"
-                                    animation={{
-                                        type: "pulse",
-                                        hover: true,
-                                        infinite: false
-                                    }} />
+                                <i
+                                    data-eva="person"
+                                    data-eva-animation="pulse"
+                                    data-eva-hover="true"
+                                    data-eva-infinite="false"/>
                             </div>
                             <div className='form-group'>
                                 <input
@@ -93,14 +90,11 @@ export default function SignUp() {
                                     value={userInfo.email}
                                     onChange={handelChange}
                                     required />
-                                <Icon
-                                    name="email"
-                                    size="large"
-                                    animation={{
-                                        type: "pulse",
-                                        hover: true,
-                                        infinite: false
-                                    }} />
+                                <i
+                                    data-eva="email"
+                                    data-eva-animation="pulse"
+                                    data-eva-hover="true"
+                                    data-eva-infinite="false" />
                             </div>
                             <div className='form-group'>
                                 <input
@@ -110,14 +104,11 @@ export default function SignUp() {
                                     name='password'
                                     onChange={handelChange}
                                     value={userInfo.password} />
-                                <Icon
-                                    name="lock"
-                                    size="large"
-                                    animation={{
-                                        type: "pulse",
-                                        hover: true,
-                                        infinite: false
-                                    }} />
+                                <i
+                                    data-eva="lock"
+                                    data-eva-animation="pulse"
+                                    data-eva-hover="true"
+                                    data-eva-infinite="false"/>
                             </div>
                             <Button
                                 type='submit'

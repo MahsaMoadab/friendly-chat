@@ -6,12 +6,13 @@ import { toast } from 'react-toastify';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, userDB, userStorage } from '../../../services/firebase';
 import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import Icon from 'react-eva-icons';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Tooltip } from '@mui/material'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip } from '@mui/material'
 import Logout from '../../../assets/images/icons/logout.svg';
 import SetNameProfile from './SetNameProfile';
 import { updateProfile } from 'firebase/auth';
 import ChatLoading from '../../../components/ChatLoading/ChatLoading';
+import Camera from "../../../assets/images/icons/camera.svg";
+import Trash from "../../../assets/images/icons/trash.svg";
 
 
 const Profile = ({ user }) => {
@@ -123,29 +124,12 @@ const Profile = ({ user }) => {
                                 </div>
                                 <div className="overlay">
                                     <label htmlFor="profile">
-                                        <Icon
-                                            name="camera"
-                                            size="large"
-                                            animation={{
-                                                type: "pulse",
-                                                hover: true,
-                                                infinite: false
-                                            }}
-                                        />
+                                        <img src={Camera} alt='' />
                                     </label>
                                     {
                                         !!profileImage &&
                                         <label onClick={handleClickOpen} htmlFor="deleteObject">
-                                            <Icon
-                                                name="trash-outline"
-                                                size="large"
-                                                fill="#FF616E"
-                                                animation={{
-                                                    type: "pulse",
-                                                    hover: true,
-                                                    infinite: false
-                                                }}
-                                            />
+                                            <img src={Trash} alt='' />
                                         </label>
                                     }
                                     <input type="file" accept='image/*' name="profile" id="profile" onChange={handelAvatarChange} />
@@ -161,11 +145,8 @@ const Profile = ({ user }) => {
                             aria-labelledby="draggable-dialog-title"
                         >
                             <DialogTitle id="draggable-dialog-title">
-                                <Icon
-                                    name="trash-outline"
-                                    size="large"
-                                    fill="#FF616E"
-                                /> <span style={{paddingBottom: '0.2em'}}>Delete Profile</span>
+                                <img src={Trash} alt='' />
+                                <span>Delete Profile</span>
                             </DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
@@ -202,14 +183,7 @@ const Profile = ({ user }) => {
             className="form-control"
             placeholder='Username' name='name'
         />
-        <Icon
-            name="person"
-            size="large"
-            animation={{
-                type: "pulse",
-                hover: true,
-                infinite: false
-            }} />
+
     </div>
     <Button
         type='submit'
