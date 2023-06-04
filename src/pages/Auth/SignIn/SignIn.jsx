@@ -2,16 +2,16 @@ import React, { useEffect, useState } from 'react'
 import { Button, Container, Grid } from '@mui/material';
 import Logo from '../../../assets/images/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
-import Icon from 'react-eva-icons';
 import { toast } from 'react-toastify';
 import ChatLoading from '../../../components/ChatLoading/ChatLoading';
 import { routes } from '../../../Routes/routes';
 import { UserAuth } from '../../../services/auth/authContext';
+import * as eva from 'eva-icons';
 
 export default function SignIn() {
 
     let navigate = useNavigate();
-    const {chat} = routes;
+    const { chat } = routes;
     const { signInUser, setOnline } = UserAuth();
     const [userInfo, setUserInfo] = useState({ email: '', password: '' });
     const [status, setStatus] = useState({ error: null, loading: false });
@@ -46,6 +46,7 @@ export default function SignIn() {
         }
     };
     useEffect(() => {
+        eva.replace();
         error && toast.error(error);
     }, [error]);
 
@@ -69,14 +70,11 @@ export default function SignIn() {
                                     value={userInfo.email}
                                     onChange={handelChange}
                                     required />
-                                <Icon
-                                    name="email"
-                                    size="large"
-                                    animation={{
-                                        type: "pulse",
-                                        hover: true,
-                                        infinite: false
-                                    }} />
+                                <i
+                                    data-eva="email"
+                                    data-eva-animation="pulse"
+                                    data-eva-hover="true"
+                                    data-eva-infinite="false" />
                             </div>
                             <div className='form-group'>
                                 <input
@@ -86,14 +84,11 @@ export default function SignIn() {
                                     name='password'
                                     onChange={handelChange}
                                     value={userInfo.password} />
-                                <Icon
-                                    name="lock"
-                                    size="large"
-                                    animation={{
-                                        type: "pulse",
-                                        hover: true,
-                                        infinite: false
-                                    }} />
+                                <i
+                                    data-eva="lock"
+                                    data-eva-animation="pulse"
+                                    data-eva-hover="true"
+                                    data-eva-infinite="false" />
                             </div>
 
                             <Button
