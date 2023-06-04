@@ -1,24 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import Icon from 'react-eva-icons';
 import { UserAuth } from '../../services/auth/authContext';
 import ChatLoading from '../../components/ChatLoading'
 import Logo from '../../assets/images/logo.png';
 import useDarkMode from '../../theme/useDarkMode';
 import { collection, doc, onSnapshot, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import { userDB } from '../../services/firebase';
-import SetNameProfile from './components/SetNameProfile';
 import ChatLogo from '../../assets/images/noChat.svg';
 import ChatMessage from './components/ChatMessage';
-import Moment from 'react-moment';
-import { Grid, Typography } from '@mui/material';
-import Profile from './components/Profile'
-import Notif from '../../assets/images/icons/notif.svg';
+import Profile from './components/Profile';
 import CurrentUser from "./components/CurrentUser";
+import UserBox from './components/UserBox';
+import { NotFound } from '../../components/NotFound/NotFound';
+import ChatBox from './components/ChatBox';
+import * as eva from 'eva-icons';
+
 export default function Chat() {
     const { user } = UserAuth();
+    const [loading, setLoading] = useState(true);
     const [theme, toggleTheme] = useDarkMode();
-
     const [toggleState, setToggleState] = useState(1);
+    const [openChat, setOpenChat] = useState(false);
+    const [chat, setChat] = useState('');
+    const [users, setUsers] = useState([]);
+    const [filterUsers, setFilterUsers] = useState([]);
+    const [userChats, setUserChats] = useState([]);
+    const [filterChats, setFilterChats] = useState([]);
+    const [messageList, setMessageList] = useState([]);
+    const [clearSearch, setClearSearch] = useState(false);
+    const [clearSearchUser, setClearSearchUser] = useState(false);
+    const [haveChat, setHaveChat] = useState(false);
 
     const toggleTab = (index) => {
         setToggleState(index);
@@ -27,10 +37,10 @@ export default function Chat() {
     const getActiveClass = (index, className) =>
         toggleState === index ? className : "";
 
-    const [users, setUsers] = useState([]);
-    const [filterUsers, setFilterUsers] = useState([]);
+
 
     useEffect(() => {
+        eva.replace();
         if (!user || !user.uid) return;
         const getUsers = async () => {
             const userRef = await collection(userDB, 'users');
@@ -49,101 +59,58 @@ export default function Chat() {
         getUsers();
     }, [user]);
 
-    const [userChats, setUserChats] = useState([]);
-    const [filterChats, setFilterChats] = useState([]);
+
 
     useEffect(() => {
         if (!user || !user.uid) return;
         const getChatList = async () => {
-            const unSubChats = onSnapshot(doc(userDB, "userChats", user.uid), (doc) => {
+            setLoading(true);
+            const unSubChats = await onSnapshot(doc(userDB, "userChats", user.uid), (doc) => {
+                console.log(doc.data());
+                if(Object.keys(doc.data()).length !== 0) setHaveChat(true);
                 setUserChats(doc.data());
                 setFilterChats(doc.data());
             });
+            setLoading(false);
             return () => unSubChats();
         }
         getChatList();
-    }, [user])
-    const [chat, setChat] = useState('');
+    }, [user]);
 
+    const [qChat, setQChat] = useState('');
 
-    const chatList = Object.entries(filterChats).length ?
-        Object.entries(filterChats).sort((a,b)=> b[1].date - a[1].date).map((user) => {
-            return (
-                <div className={`list_chat_box ${chat.name && true === user[1]['userInfo'].name && 'list_chat_box_active'}`} key={user[0]} onClick={() => selectUserChat(user[1]['userInfo'].uid, user[0])}>
-                    <div className='list_chat_box_message'>
-                        <div className='user'>
-                            <div className='default_profile'>
-                                {user[1]['userInfo'].avatar ? <img src={user[1]['userInfo'].avatar} alt='' /> : SetNameProfile(user[1]['userInfo'].name)}
-                            </div>
-                        </div>
-                        <div className='details'>
-                            <span className="username">{user[1]['userInfo'].name}</span>
-                            <p className='last_message'>{user[1]['userInfo'].text}</p>
-                        </div>
-                    </div>
-                    <div className='time_notif'>
-                        <p className='last_message_time'><Moment date={user[1]['date'].toDate()} format="h:mm" /></p>
-                        {user[1]['unread'] && <p className='notif_number'><img src={Notif} alt="" /></p>}
-                    </div>
-                </div>)
-        })
-        : <Grid container alignItems={'center'} gap={1} justifyContent={'center'} className='no_contact'>
-            <Icon
-                name="message-circle-outline"
-                size="xlarge"
-                fill="#007BFF" />
-            <Typography variant="p" component="p" color={'#007BFF'}>
-                No Chat to display
-            </Typography>
-        </Grid>;
     const handleSearchChat = (query) => {
-        if (query === "") return setFilterChats(userChats)
+        setQChat(query)
+        setClearSearch(true);
+        if (query === "") {
+            setClearSearch(false);
+            setQChat('');
+            return setFilterChats(userChats)}
+        
         const results = Object.entries(filterChats).filter(chat => {
             if (query === "") return setFilterChats(userChats)
             return chat[1]['userInfo'].text.toLowerCase().includes(query.toLowerCase())
         });
         setFilterChats(Object.fromEntries(results));
     }
+    const [qUser, setqUser] = useState('')
     const handleSearch = (query) => {
-        if (query === "") return setFilterUsers(users)
+        setqUser(query);
+        setClearSearchUser(true);
+        if (query === "") {
+            setqUser('');
+            setClearSearchUser(false);
+            return setFilterUsers(users)}
         const results = filterUsers.filter(user => {
             if (query === "") return setFilterUsers(users)
             return user.name.toLowerCase().includes(query.toLowerCase())
         });
         setFilterUsers(results)
     }
-    const contactList = (filterUsers.length > 0) ?
-        filterUsers.map((user) => {
-            return (
-                <div className={`list_chat_box`} key={user.uid} onClick={() => selectUser(user)}>
-                    <div className='list_chat_box_message' >
-                        <div className='user'>
-                            <div className='default_profile'>
-                                {user.photoURL ? <img src={user.photoURL} alt='' /> : SetNameProfile(user.name)}
-                            </div>
-                            <span className={`status ${user.isOnline ? 'online' : 'offline'}`}></span>
-                        </div>
-                        <div className='details'>
-                            <span className="username">{user.name}</span>
-                            <p className='last_message'>{user.isOnline ? 'Online' : <> last active <Moment date={user.lastActive.toDate()} format="LT" /></>}</p>
-                        </div>
-                    </div>
-                </div>)
-        })
-        : <Grid container alignItems={'center'} gap={1} justifyContent={'center'} className='no_contact'>
-            <Icon
-                name="people-outline"
-                size="xlarge"
-                fill="#007BFF" />
-            <Typography variant="p" component="p" color={'#007BFF'}>
-                No Contact to display
-            </Typography>
-        </Grid>;
 
-
-    const [messageList, setMessageList] = useState([]);
     const selectUser = async (userSelect) => {
         setChat(userSelect);
+        setOpenChat(true);
         const user1 = user.uid;
         const user2 = userSelect.uid;
         const messageId = user1 > user2 ? `${user1 + user2}` : `${user2 + user1}`;
@@ -158,7 +125,18 @@ export default function Chat() {
         });
         toggleTab(1)
     }
+    const contactList = (filterUsers.length > 0) ?
+        filterUsers.map((user) => {
+            return <UserBox key={user.uid} user={user} selectUser={selectUser} />
+        })
+        : <NotFound message={"No Contact to display"} icon={"people-outline"} />;
 
+    const handleClearSearch = ()=>{
+        handleSearchChat('');
+    }
+    const handleClearSearchUser = ()=>{
+        handleSearch('');
+    }
 
     const selectUserChat = async (userSelect, messageId) => {
         const getChat = async () => {
@@ -168,6 +146,7 @@ export default function Chat() {
             return () => unSubChats();
         }
         getChat();
+        setOpenChat(true);
         await updateDoc(doc(userDB, "userChats", user.uid), {
             [messageId + ".unread"]: false,
         });
@@ -181,12 +160,26 @@ export default function Chat() {
             setMessageList(msgs)
         });
     }
+console.log(Object.keys(filterChats).length);
+    const chatList = haveChat ?
+        Object.entries(filterChats).sort((a, b) => b[1].date - a[1].date).map((user) => {
+            return <ChatBox key={user[1]['userInfo'].uid} user={user} chat={chat} selectUserChat={selectUserChat} />
+        })
+        : <NotFound message={"No Chat to display"} icon={"message-circle-outline"} />;
+
+    
+
+    const closeChat = () => {
+        setOpenChat(false);
+        setChat('');
+        setMessageList([]);
+    }
 
 
     return (
         <>
             {
-                !user && <ChatLoading />
+                loading && <ChatLoading />
             }
             {
                 !!user && <>
@@ -195,58 +188,53 @@ export default function Chat() {
                             <div className='main_chat_sidebar'>
                                 <div className="sidebar_top">
                                     <img className='logo' src={Logo} alt='' />
-                                    <div>
-                                        <p className={`tabs ${getActiveClass(1, "active-tabs")}`} onClick={() => toggleTab(1)}>
-                                            <Icon
-                                                name="message-circle"
-                                                size="xlarge"
-                                                animation={{
-                                                    type: "pulse",
-                                                    hover: true,
-                                                    infinite: false
-                                                }} />
-                                        </p>
-                                        <p className={`tabs ${getActiveClass(2, "active-tabs")}`} onClick={() => toggleTab(2)}>
-                                            <Icon
-                                                name="people"
-                                                size="xlarge"
-                                                animation={{
-                                                    type: "pulse",
-                                                    hover: true,
-                                                    infinite: false
-                                                }} />
-                                        </p>
-                                        <p className={`tabs ${getActiveClass(3, "active-tabs")}`} onClick={() => toggleTab(3)}>
-                                            <Icon
-                                                name="phone"
-                                                size="xlarge"
-                                                animation={{
-                                                    type: "pulse",
-                                                    hover: true,
-                                                    infinite: false
-                                                }} />
-                                        </p>
-                                    </div>
+                                    <p className={`tabs ${getActiveClass(1, "active-tabs")}`} onClick={() => toggleTab(1)}>
+                                        <i
+                                            data-eva="message-circle"
+                                            data-eva-animation="pulse"
+                                            data-eva-hover="true"
+                                            data-eva-infinite="false" />
+                                    </p>
+                                    <p className={`tabs ${getActiveClass(2, "active-tabs")}`} onClick={() => toggleTab(2)}>
+
+                                        <i
+                                            data-eva="people"
+                                            data-eva-animation="pulse"
+                                            data-eva-hover="true"
+                                            data-eva-infinite="false" />
+                                    </p>
+                                    <p className={`tabs ${getActiveClass(3, "active-tabs")}`} onClick={() => toggleTab(3)}>
+
+                                        <i
+                                            data-eva="phone"
+                                            data-eva-animation="pulse"
+                                            data-eva-hover="true"
+                                            data-eva-infinite="false" />
+                                    </p>
+
+                                    <p className={`tabs settings_mobile ${getActiveClass(4, "active-tabs")}`} onClick={() => toggleTab(4)}>
+                                        <i
+                                            data-eva="settings"
+                                            data-eva-animation="pulse"
+                                            data-eva-hover="true"
+                                            data-eva-infinite="false" />
+                                    </p>
                                 </div>
 
                                 <div className="sidebar_bottom">
                                     <p className={`tabs ${getActiveClass(4, "active-tabs")}`} onClick={() => toggleTab(4)}>
-                                        <Icon
-                                            name="settings"
-                                            animation={{
-                                                type: "pulse",
-                                                hover: true,
-                                                infinite: false
-                                            }} />
+                                        <i
+                                            data-eva="settings"
+                                            data-eva-animation="pulse"
+                                            data-eva-hover="true"
+                                            data-eva-infinite="false" />
                                     </p>
                                     <button className='theme' datatype={theme} onClick={e => toggleTheme()}>
-                                        <Icon
-                                            name="bulb"
-                                            animation={{
-                                                type: "pulse",
-                                                hover: true,
-                                                infinite: false
-                                            }} />
+                                        <i
+                                            data-eva="bulb"
+                                            data-eva-animation="pulse"
+                                            data-eva-hover="true"
+                                            data-eva-infinite="false" />
                                     </button>
                                     <CurrentUser user={user} />
                                 </div>
@@ -255,23 +243,20 @@ export default function Chat() {
                             <div className="main_chat_tab">
                                 <div className={`main_chat_list content ${getActiveClass(1, "active-content")}`}>
                                     <div className="list_search">
-                                        <input className='form-control' type="text" placeholder='Chats' onChange={e => handleSearchChat(e.target.value)}/>
-                                        <Icon
-                                            name="search"
-                                            size="xlarge" />
+                                        <input className='form-control' type="text" placeholder='Chats' value={qChat} onChange={e => handleSearchChat(e.target.value)} />
+                                        <i data-eva="search" data-eva-hover="true" />
+                                        <button className={`clear_button ${clearSearch ? 'show_clear' : ''}`} onClick={handleClearSearch}>×</button>
                                     </div>
 
                                     <div className="list_chat">
-
                                         {chatList}
                                     </div>
                                 </div>
                                 <div className={`main_chat_list content ${getActiveClass(2, "active-content")}`}>
                                     <div className="list_search">
-                                        <input className='form-control' type="text" placeholder='Contact' onChange={e => handleSearch(e.target.value)} />
-                                        <Icon
-                                            name="search"
-                                            size="xlarge" />
+                                        <input value={qUser} className='form-control' type="text" placeholder='Contact' onChange={e => handleSearch(e.target.value)} />
+                                        <i data-eva="search" data-eva-hover="true" />
+                                        <button className={`clear_button ${clearSearchUser ? 'show_clear' : ''}`} onClick={handleClearSearchUser}>×</button>
                                     </div>
 
                                     <div className="list_chat">
@@ -303,14 +288,14 @@ export default function Chat() {
                                 </div>
                             </div>
 
-                            <div className='main_chat_message'>
+                            <div className={`main_chat_message ${openChat ? 'open' : ''}`}>
                                 {
                                     !chat ?
                                         <div className="no_message">
                                             <img src={ChatLogo} alt="" />
                                         </div>
                                         :
-                                        <ChatMessage chat={chat} messageList={messageList} />
+                                        <ChatMessage chat={chat} messageList={messageList} closeChat={closeChat} />
                                 }
                             </div>
                         </div>
