@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import SetNameProfile from './SetNameProfile'
 import { Button, Divider, Grow } from '@mui/material'
-import Icon from 'react-eva-icons';
 import { useEffect } from 'react';
 import SendIcon from '../../../assets/images/send.svg'
 import { Timestamp, addDoc, collection, doc, updateDoc } from 'firebase/firestore';
@@ -10,8 +9,10 @@ import { UserAuth } from '../../../services/auth/authContext';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { MessageBox } from './MessageBox';
 import Moment from 'react-moment';
+import Attach from "../../../assets/images/icons/attach.svg";
+import BackIcon from "../../../assets/images/icons/back.svg";
 
-const ChatMessage = ({ chat, messageList }) => {
+const ChatMessage = ({ chat, messageList, closeChat }) => {
 
     const [animation, setAnimation] = useState(false);
     const { user } = UserAuth();
@@ -25,12 +26,18 @@ const ChatMessage = ({ chat, messageList }) => {
         setAnimation(true);
     }, [chat]);
 
+    const handleAttach = (file) => {
+        setImg(file);
+        const fileType = file['type'];
+        const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svgz', 'image/ico', 'image/tif'];
+        if (!validImageTypes.includes(fileType)) {
+            console.log("no image");
+        }
+    }
     const sendMessageHandle = async (e) => {
         e.preventDefault();
-        if (!text) return;
         let url = '';
         if (img) {
-            console.log('have img');
             const imgRef = ref(userStorage, `images/${new Date().getTime()}-${img.name}`);
             const snap = await uploadBytes(imgRef, img)
             const dlurl = await getDownloadURL(ref(userStorage, snap.ref.fullPath));
@@ -44,7 +51,7 @@ const ChatMessage = ({ chat, messageList }) => {
             createdAt: Timestamp.fromDate(new Date()),
         });
 
-       const messageText = text;
+        const messageText = text;
         setText('');
 
         await updateDoc(doc(userDB, "userChats", user.uid), {
@@ -91,13 +98,9 @@ const ChatMessage = ({ chat, messageList }) => {
                                 <p className='username'>{chat.name}</p>
                                 <p className='last_active'>{chat.isOnline ? 'Online' : <>last active <Moment date={chat.lastActive.toDate()} format="LT" /></>}</p>
                             </div>
-
                         </div>
                         <div className='message_header_action'>
-                            <div>
-                                <Icon name="video" size="xlarge" />
-                            </div>
-                            <Icon name="phone" size="xlarge" />
+                            <button className='close__Chat' onClick={closeChat}><img src={BackIcon} alt="" /></button>
                         </div>
                     </div>
                     <Divider />
@@ -118,8 +121,10 @@ const ChatMessage = ({ chat, messageList }) => {
                     <form action="">
                         <div className='message_handler'>
                             <div>
-                                <label htmlFor="attach"><Icon name="attach" size="xlarge" /></label>
-                                <input onChange={e => setImg(e.target.files[0])} type="file" name='attach' id='attach' style={{ display: 'none' }} />
+                                <label htmlFor="attach">
+                                    <img src={Attach} alt='' />
+                                </label>
+                                <input accept="image/*" onChange={e => handleAttach(e.target.files[0])} type="file" name='attach' id='attach' style={{ display: 'none' }} />
                             </div>
                             <div className='form_input'>
                                 <input value={text} onChange={e => setText(e.target.value)} placeholder='Type message...' />
