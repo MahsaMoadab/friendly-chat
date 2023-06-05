@@ -333,15 +333,6 @@ a {
                 width: 2em;
                 height: 2.5em;
             }
-
-            .settings_mobile {
-                display: none;
-
-                @media (max-width:767px) {
-                    display: flex;
-                }
-            }
-
             .sidebar {
                 &_top {
                     display: flex;
@@ -714,6 +705,10 @@ a {
         justify-content: space-between;
         height: 100%;
 
+        &.hidden{
+            display: none;
+        }
+
         .eva {
             cursor: pointer;
             fill: #ABA9AC;
@@ -768,6 +763,21 @@ a {
 
                         &:hover {
                             filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+                        }
+                    }
+                }
+
+                .call_btn{
+                    background: unset;
+                    cursor: pointer;
+                    outline: unset;
+                    border: unset;
+                    transition: transform 0.8s ease-in-out;
+                    img {
+                        width: 3.3em;
+
+                        &:hover {
+                            transform: scale(1.11);
                         }
                     }
                 }
@@ -852,12 +862,33 @@ a {
                 p {
                     margin: 0;
                 }
-
                 &.you {
                     color: $white;
                     background: #0573EA;
                     border-radius: 17px 0px 17px 17px;
                     margin-left: auto;
+                }
+                &.call{
+                    border-radius: 17px;
+                    width: 100%;
+                    margin: 0 auto;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    button{
+                        background: unset;
+                        border: unset;
+                        color: unset;
+                        width: 100%;
+                        font-weight: bold;
+                        font-size: 1rem;
+                        cursor: pointer;
+                        font-family: 'Inter UI';
+                        padding: 0.5em;
+                    }
+                    &:hover{
+                        box-shadow: 0px 0px 15px #00000075;
+                    }
                 }
             }
 
@@ -1113,6 +1144,24 @@ body {
                     }
                 }
             }
+        }
+    }
+}
+
+.view_call{
+    display: none;
+    &.join_call{
+        display: block;
+    }
+}
+
+#jitsi-iframe{
+    iframe{
+        height: calc(100vh - 1.5em) !important;
+        border-radius: 0 2em 2em 0;
+        @media (max-width:767px) {
+            height: 100vh !important;
+            border-radius: 0;
         }
     }
 }
