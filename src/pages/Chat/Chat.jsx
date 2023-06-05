@@ -16,7 +16,6 @@ import * as eva from 'eva-icons';
 
 export default function Chat() {
     const { user } = UserAuth();
-    const [loading, setLoading] = useState(true);
     const [theme, toggleTheme] = useDarkMode();
     const [toggleState, setToggleState] = useState(1);
     const [openChat, setOpenChat] = useState(false);
@@ -64,14 +63,12 @@ export default function Chat() {
     useEffect(() => {
         if (!user || !user.uid) return;
         const getChatList = async () => {
-            setLoading(true);
             const unSubChats = await onSnapshot(doc(userDB, "userChats", user.uid), (doc) => {
                 console.log(doc.data());
-                if(Object.keys(doc.data()).length !== 0) setHaveChat(true);
+                if (Object.keys(doc.data()).length !== 0) setHaveChat(true);
                 setUserChats(doc.data());
                 setFilterChats(doc.data());
             });
-            setLoading(false);
             return () => unSubChats();
         }
         getChatList();
@@ -85,8 +82,9 @@ export default function Chat() {
         if (query === "") {
             setClearSearch(false);
             setQChat('');
-            return setFilterChats(userChats)}
-        
+            return setFilterChats(userChats)
+        }
+
         const results = Object.entries(filterChats).filter(chat => {
             if (query === "") return setFilterChats(userChats)
             return chat[1]['userInfo'].text.toLowerCase().includes(query.toLowerCase())
@@ -100,7 +98,8 @@ export default function Chat() {
         if (query === "") {
             setqUser('');
             setClearSearchUser(false);
-            return setFilterUsers(users)}
+            return setFilterUsers(users)
+        }
         const results = filterUsers.filter(user => {
             if (query === "") return setFilterUsers(users)
             return user.name.toLowerCase().includes(query.toLowerCase())
@@ -131,10 +130,10 @@ export default function Chat() {
         })
         : <NotFound message={"No Contact to display"} icon={"people-outline"} />;
 
-    const handleClearSearch = ()=>{
+    const handleClearSearch = () => {
         handleSearchChat('');
     }
-    const handleClearSearchUser = ()=>{
+    const handleClearSearchUser = () => {
         handleSearch('');
     }
 
@@ -160,14 +159,12 @@ export default function Chat() {
             setMessageList(msgs)
         });
     }
-console.log(Object.keys(filterChats).length);
+
     const chatList = haveChat ?
         Object.entries(filterChats).sort((a, b) => b[1].date - a[1].date).map((user) => {
             return <ChatBox key={user[1]['userInfo'].uid} user={user} chat={chat} selectUserChat={selectUserChat} />
         })
         : <NotFound message={"No Chat to display"} icon={"message-circle-outline"} />;
-
-    
 
     const closeChat = () => {
         setOpenChat(false);
@@ -179,7 +176,7 @@ console.log(Object.keys(filterChats).length);
     return (
         <>
             {
-                loading && <ChatLoading />
+                !user && <ChatLoading />
             }
             {
                 !!user && <>
@@ -203,16 +200,9 @@ console.log(Object.keys(filterChats).length);
                                             data-eva-hover="true"
                                             data-eva-infinite="false" />
                                     </p>
-                                    <p className={`tabs ${getActiveClass(3, "active-tabs")}`} onClick={() => toggleTab(3)}>
+                                 
 
-                                        <i
-                                            data-eva="phone"
-                                            data-eva-animation="pulse"
-                                            data-eva-hover="true"
-                                            data-eva-infinite="false" />
-                                    </p>
-
-                                    <p className={`tabs settings_mobile ${getActiveClass(4, "active-tabs")}`} onClick={() => toggleTab(4)}>
+                                    <p className={`tabs ${getActiveClass(4, "active-tabs")}`} onClick={() => toggleTab(4)}>
                                         <i
                                             data-eva="settings"
                                             data-eva-animation="pulse"
@@ -222,13 +212,6 @@ console.log(Object.keys(filterChats).length);
                                 </div>
 
                                 <div className="sidebar_bottom">
-                                    <p className={`tabs ${getActiveClass(4, "active-tabs")}`} onClick={() => toggleTab(4)}>
-                                        <i
-                                            data-eva="settings"
-                                            data-eva-animation="pulse"
-                                            data-eva-hover="true"
-                                            data-eva-infinite="false" />
-                                    </p>
                                     <button className='theme' datatype={theme} onClick={e => toggleTheme()}>
                                         <i
                                             data-eva="bulb"
@@ -261,26 +244,6 @@ console.log(Object.keys(filterChats).length);
 
                                     <div className="list_chat">
                                         {contactList}
-                                    </div>
-                                </div>
-                                <div className={`main_chat_list content ${getActiveClass(3, "active-content")}`}>
-                                    <div className="list_chat">
-                                        <h2>Call history</h2>
-                                        <div className="list_chat_box">
-                                            <div className='list_chat_box_message'>
-                                                <div className='user'>
-                                                    {/* <img src={Logo} alt='' /> */}
-                                                    <div className='default_profile'>
-                                                        M
-                                                    </div>
-                                                </div>
-                                                <div className='details'>
-                                                    <span className="username">Mahsa Moadab</span>
-                                                    <p className='last_message'>53 sec , 21:10</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
                                     </div>
                                 </div>
                                 <div className={`content ${getActiveClass(4, "active-content")}`}>
