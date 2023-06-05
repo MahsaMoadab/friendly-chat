@@ -14,7 +14,7 @@ export default function ChatBox({ user, chat, selectUserChat }) {
                 </div>
                 <div className='details'>
                     <span className="username">{user[1]['userInfo'].name}</span>
-                    <p className='last_message'>{user[1]['userInfo'].text}</p>
+                    <p className='last_message'>{user[1]['userInfo'].text ? user[1]['userInfo'].text : user[1]['userInfo'].media ? user[1]['userInfo'].media : user[1]['userInfo'].call ? "Video message" : ""}</p>
                 </div>
             </div>
             <div className='time_notif'>
