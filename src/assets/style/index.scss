@@ -939,6 +939,7 @@ a {
 }
 
 #jitsi-iframe {
+    width: 100%;
     iframe {
         height: calc(100vh - 1.5em) !important;
         border-radius: 0 2em 2em 0;
@@ -1298,7 +1299,23 @@ h4 {
     display: none;
 
     &.join_call {
-        display: block;
+        display: flex;
+        position: relative;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .calling{
+        position: absolute;
+        color: #fff;
+        top: 9.8em;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.664);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        padding: 0.8em;
     }
 }
 .attach{
