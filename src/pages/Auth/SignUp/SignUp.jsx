@@ -7,6 +7,7 @@ import ChatLoading from '../../../components/ChatLoading/ChatLoading';
 import { UserAuth } from '../../../services/auth/authContext';
 import { routes } from '../../../Routes/routes';
 import * as eva from 'eva-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function SignUp() {
     let navigate = useNavigate();
@@ -19,6 +20,7 @@ export default function SignUp() {
     });
 
     const [status, setStatus] = useState({ error: null, loading: false })
+    const { t } = useTranslation();
 
     function handelChange(event) {
         const { name, value } = event.target;
@@ -29,8 +31,9 @@ export default function SignUp() {
     const { error, loading } = status;
     const handelUserSignUp = async (e) => {
         e.preventDefault();
-        if (!name || !email || !password) {
-            setStatus({ loading: false, error: 'All fields are required.' });
+        if (!name) return toast.error(t('All fields are required.'));
+        if (!email || !password) {
+            setStatus({ loading: false, error: t('All fields are required.') });
         }
         try {
             setStatus({ ...status, loading: true });
@@ -46,10 +49,10 @@ export default function SignUp() {
             });
             setStatus({ error: null, loading: false });
             localStorage.setItem('user', result.user.uid)
-            toast.success('sign up is successfull.');
+            toast.success(t('Sign up is successfull.'));
             navigate(chat);
         } catch (err) {
-            setStatus({ error: err.message, loading: false });
+            setStatus({ error: t(err.message), loading: false });
         }
     };
     useEffect(() => {
@@ -65,27 +68,29 @@ export default function SignUp() {
                     <Grid className='item' item>
                         <Grid className='item__header' container columnGap={2} alignItems={'center'}>
                             <img src={Logo} alt='' />
-                            <h2>Sign Up</h2>
+                            <h2>{t('Sign Up')}</h2>
                         </Grid>
                         <form action="">
                             <div className='form-group'>
                                 <input
                                     type={'text'}
                                     className="form-control"
-                                    placeholder='Username' name='name'
+                                    placeholder={t('label.Username')}
+                                    name='name'
+                                    required
                                     onChange={handelChange}
                                     value={userInfo.name} />
                                 <i
                                     data-eva="person"
                                     data-eva-animation="pulse"
                                     data-eva-hover="true"
-                                    data-eva-infinite="false"/>
+                                    data-eva-infinite="false" />
                             </div>
                             <div className='form-group'>
                                 <input
                                     type={'email'}
                                     className="form-control"
-                                    placeholder='Email Address'
+                                    placeholder={t("label.email")}
                                     name='email'
                                     value={userInfo.email}
                                     onChange={handelChange}
@@ -100,7 +105,7 @@ export default function SignUp() {
                                 <input
                                     type={'password'}
                                     className="form-control"
-                                    placeholder='Password'
+                                    placeholder={t("label.password")}
                                     name='password'
                                     onChange={handelChange}
                                     value={userInfo.password} />
@@ -108,7 +113,7 @@ export default function SignUp() {
                                     data-eva="lock"
                                     data-eva-animation="pulse"
                                     data-eva-hover="true"
-                                    data-eva-infinite="false"/>
+                                    data-eva-infinite="false" />
                             </div>
                             <Button
                                 type='submit'
@@ -117,9 +122,9 @@ export default function SignUp() {
                                 variant="contained"
                                 size="large"
                                 className='btn_primary'>
-                                {loading ? "Registering account..." : "Create account"}
+                                {loading ? t("Registering account...") : t('btn.register')}
                             </Button>
-                            <p className='link_span'>Already a member? <Link to={'/auth/sign_in'}>Sign In.</Link></p>
+                            <p className='link_span'>{t('Already a member?')} <Link to={'/auth/sign_in'}>{t('login')}</Link></p>
                         </form>
                     </Grid>
                 </Container>

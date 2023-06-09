@@ -7,6 +7,7 @@ import ChatLoading from '../../../components/ChatLoading/ChatLoading';
 import { routes } from '../../../Routes/routes';
 import { UserAuth } from '../../../services/auth/authContext';
 import * as eva from 'eva-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function SignIn() {
 
@@ -15,7 +16,7 @@ export default function SignIn() {
     const { signInUser, setOnline } = UserAuth();
     const [userInfo, setUserInfo] = useState({ email: '', password: '' });
     const [status, setStatus] = useState({ error: null, loading: false });
-
+    const { t } = useTranslation();
 
     function handelChange(event) {
         const { name, value } = event.target;
@@ -28,7 +29,7 @@ export default function SignIn() {
     const handelUserSignIn = async (e) => {
         e.preventDefault();
         if (!email || !password) {
-            setStatus({ loading: false, error: 'All fields are required.' });
+            setStatus({ loading: false, error: t('All fields are required.') });
         }
         else {
             try {
@@ -38,10 +39,10 @@ export default function SignIn() {
                 setUserInfo({ email: '', password: '' });
                 setStatus({ error: null, loading: false });
                 localStorage.setItem('user', result.user.uid)
-                toast.success('sign In is successfull.');
+                toast.success(t("sign In is successfull."));
                 navigate(chat)
             } catch (err) {
-                setStatus({ error: err.message, loading: false });
+                setStatus({ error: t(err.message), loading: false });
             }
         }
     };
@@ -59,13 +60,13 @@ export default function SignIn() {
                         <Grid className='item' item>
                             <Grid className='item__header' container columnGap={2} alignItems={'center'}>
                                 <img src={Logo} alt='' />
-                                <h2>Sign In</h2>
+                                <h2>{t('Sign In')}</h2>
                             </Grid>
                             <div className='form-group'>
                                 <input
                                     type={'email'}
                                     className="form-control"
-                                    placeholder='Email Address'
+                                    placeholder={t("label.email")}
                                     name='email'
                                     value={userInfo.email}
                                     onChange={handelChange}
@@ -80,7 +81,7 @@ export default function SignIn() {
                                 <input
                                     type={'password'}
                                     className="form-control"
-                                    placeholder='Password'
+                                    placeholder={t("label.password")}
                                     name='password'
                                     onChange={handelChange}
                                     value={userInfo.password} />
@@ -98,9 +99,9 @@ export default function SignIn() {
                                 variant="contained"
                                 size="large"
                                 className='btn_primary'>
-                                {loading ? "Loading..." : "Login"}
+                                {loading ? t("Loading") : t("btn.login")}
                             </Button>
-                            <p className='link_span'>Don't have account? <Link to={'/auth/sign_up'}>Create Account.</Link></p>
+                            <p className='link_span'>{t("Don't have account?")} <Link to={'/auth/sign_up'}>{t("Create Account.")}</Link></p>
                         </Grid>
                     </form>
                 </Container>

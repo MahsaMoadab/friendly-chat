@@ -1,8 +1,11 @@
 import { Grid, Typography } from '@mui/material'
 import * as eva from 'eva-icons';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const NotFound = ({ message, icon }) => {
+    const { t } = useTranslation();
+
     useEffect(() => {
         eva.replace();
     }, [])
@@ -16,7 +19,7 @@ export const NotFound = ({ message, icon }) => {
                 data-eva-fill="#007BFF"
                 data-eva-infinite="false" />
             <Typography variant="p" component="p" color={'#007BFF'}>
-                {message}
+                {t(message)}
             </Typography>
         </Grid>
     )
