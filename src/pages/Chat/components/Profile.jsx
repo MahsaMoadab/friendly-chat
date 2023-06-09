@@ -6,19 +6,27 @@ import { toast } from 'react-toastify';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { auth, userDB, userStorage } from '../../../services/firebase';
 import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip } from '@mui/material'
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, MenuItem, Select, Tooltip } from '@mui/material'
 import Logout from '../../../assets/images/icons/logout.svg';
 import SetNameProfile from './SetNameProfile';
 import { updateProfile } from 'firebase/auth';
 import ChatLoading from '../../../components/ChatLoading/ChatLoading';
 import Camera from "../../../assets/images/icons/camera.svg";
 import Trash from "../../../assets/images/icons/trash.svg";
+import Persian from "../../../assets/images/icons/fa.svg";
+import English from "../../../assets/images/icons/en.svg";
+import { useTranslation } from 'react-i18next';
+import useLang from '../../../lang/useLang';
+import useDarkMode from '../../../theme/useDarkMode';
 
 
 const Profile = ({ user }) => {
     const { logoutUser, setOffline } = UserAuth();
     let navigate = useNavigate();
     const { signIn } = routes;
+    const { t } = useTranslation();
+    const [lang, changeLang] = useLang();
+    const [theme, chooseTheme] = useDarkMode();
 
     const [loading, setLoading] = useState(false)
     const handelUserSignOut = async () => {
@@ -48,7 +56,7 @@ const Profile = ({ user }) => {
         };
         getUser();
 
-    }, [user])
+    }, [user, navigate, signIn])
 
     const handelAvatarChange = (e) => {
         setLoading(true);
@@ -70,7 +78,7 @@ const Profile = ({ user }) => {
                     photoURL: url
                 });
                 setLoading(false);
-                toast.success('پروفایل شما با موفقیت تغییر کرد.')
+                toast.success(t('Your profile has been successfully changed.'))
             } catch (err) {
                 toast.error(err.message)
             }
@@ -93,10 +101,10 @@ const Profile = ({ user }) => {
             await updateProfile(auth.currentUser, {
                 photoURL: ''
             });
-            toast.success('Profile deleted successfully.')
+            toast.success(t('Profile deleted successfully.'))
             setProfileImage();
         } catch (err) {
-            console.log(err);
+            toast.error(err);
         }
         setLoading(false);
     }
@@ -110,6 +118,28 @@ const Profile = ({ user }) => {
     const handleClose = () => {
         setOpen(false);
     };
+
+    console.log(lang);
+    const [language, setLanguage] = useState(lang);
+    const [changeTheme, setChangeTheme] = useState(theme);
+
+    useEffect(() => {
+        setLanguage(lang)
+    }, [lang]);
+    useEffect(() => {
+        setChangeTheme(theme)
+    }, [theme])
+
+    const handleChange = (event) => {
+        setLanguage(event.target.value);
+        changeLang(event.target.value);
+    };
+
+    const handleChangeTheme = (event) => {
+        setChangeTheme(event.target.value);
+        chooseTheme(event.target.value);
+    };
+
     return (
         <>
             {loading && <ChatLoading />}
@@ -146,25 +176,23 @@ const Profile = ({ user }) => {
                         >
                             <DialogTitle id="draggable-dialog-title">
                                 <img src={Trash} alt='' />
-                                <span>Delete Profile</span>
+                                <span>{t('Delete Profile')}</span>
                             </DialogTitle>
                             <DialogContent>
                                 <DialogContentText>
-                                    Delete Profile image?
+                                    {t('Delete Profile image?')}
                                 </DialogContentText>
                             </DialogContent>
                             <DialogActions>
-                                {/* <Grid> */}
-                                <Button variant="outlined" onClick={handleClose}>
-                                    Cancel
+                                <Button variant="outlined" style={{ margin: '0 0.5em' }} onClick={handleClose}>
+                                    {t('Cancel')}
                                 </Button>
-                                <Button color='error' variant="contained" onClick={handleDeleteAvatar}>Delete</Button>
-                                {/* </Grid> */}
+                                <Button color='error' variant="contained" onClick={handleDeleteAvatar}>{t('Delete')}</Button>
 
                             </DialogActions>
                         </Dialog>
                         <div className='logout'>
-                            <Tooltip title="Logout">
+                            <Tooltip title={t("Logout")}>
                                 <Button
                                     onClick={e => handelUserSignOut()}
                                     type='submit'
@@ -174,27 +202,35 @@ const Profile = ({ user }) => {
                             </Tooltip>
                         </div>
                     </div>
-                    <h2>Settings</h2>
-                    {/* <form action="">
-   
-    <div className='form-group'>
-        <input
-            type={'text'}
-            className="form-control"
-            placeholder='Username' name='name'
-        />
+                    <h2>{t('Settings')}</h2>
 
-    </div>
-    <Button
-        type='submit'
-        variant="contained"
-        size="large"
-        className='btn_primary' fullWidth>
-        save
-    </Button>
-</form> */}
+                    <div>
+                        <h4>{t('Language selection')}</h4>
+                        <FormControl fullWidth>
+                            <Select
+                                value={language}
+                                onChange={handleChange}
+                                variant="filled"
+                            >
+                                <MenuItem value='fa'><img className='img_lang' src={Persian} alt='fa' />{t('Persian')}</MenuItem>
+                                <MenuItem value='en'><img className='img_lang' src={English} alt='en' />{t('English')}</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
 
-
+                    <div style={{marginTop: '1em'}}>
+                        <h4>{t('Choose theme')}</h4>
+                        <FormControl fullWidth>
+                            <Select
+                                value={changeTheme}
+                                onChange={handleChangeTheme}
+                                variant="filled"
+                            >
+                                <MenuItem value='light'>{t('Light')}</MenuItem>
+                                <MenuItem value='dark'>{t('Dark')}</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
                 </div>
                 : null}
         </>
