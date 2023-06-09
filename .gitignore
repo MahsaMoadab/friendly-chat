@@ -2,7 +2,7 @@
 /node_modules
 /.pnp
 .pnp.js
-/src/services/firebase.js
+# /src/services/firebase.js
 package-lock.json
 
 # testing
