@@ -13,8 +13,13 @@ import UserBox from './components/UserBox';
 import { NotFound } from '../../components/NotFound/NotFound';
 import ChatBox from './components/ChatBox';
 import * as eva from 'eva-icons';
+import { useTranslation } from 'react-i18next';
+import { routes } from '../../Routes/routes';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function Chat() {
+    const { t } = useTranslation();
     const { user } = UserAuth();
     const [theme, toggleTheme] = useDarkMode();
     const [toggleState, setToggleState] = useState(1);
@@ -28,7 +33,7 @@ export default function Chat() {
     const [clearSearch, setClearSearch] = useState(false);
     const [clearSearchUser, setClearSearchUser] = useState(false);
     const [haveChat, setHaveChat] = useState(false);
-
+    
     const toggleTab = (index) => {
         setToggleState(index);
     };
@@ -64,7 +69,6 @@ export default function Chat() {
         if (!user || !user.uid) return;
         const getChatList = async () => {
             const unSubChats = await onSnapshot(doc(userDB, "userChats", user.uid), (doc) => {
-                console.log(doc.data());
                 if (Object.keys(doc.data()).length !== 0) setHaveChat(true);
                 setUserChats(doc.data());
                 setFilterChats(doc.data());
@@ -171,6 +175,18 @@ export default function Chat() {
         setChat('');
         setMessageList([]);
     }
+    const { logoutUser, setOffline } = UserAuth();
+    let navigate = useNavigate();
+    const { signIn } = routes;
+    const handelUserSignOut = async () => {
+        try {
+            await setOffline(user.uid)
+            await logoutUser();
+            navigate(signIn);
+        } catch (error) {
+            toast.error(error.message);
+        }
+    }
 
 
     return (
@@ -209,6 +225,13 @@ export default function Chat() {
                                             data-eva-hover="true"
                                             data-eva-infinite="false" />
                                     </p>
+                                    <p className={`tabs mobile_icon`} onClick={() => handelUserSignOut()}>
+                                        <i
+                                            data-eva="log-out"
+                                            data-eva-animation="pulse"
+                                            data-eva-hover="true"
+                                            data-eva-infinite="false" />
+                                    </p>
                                 </div>
 
                                 <div className="sidebar_bottom">
@@ -226,7 +249,7 @@ export default function Chat() {
                             <div className="main_chat_tab">
                                 <div className={`main_chat_list content ${getActiveClass(1, "active-content")}`}>
                                     <div className="list_search">
-                                        <input className='form-control' type="text" placeholder='Chats' value={qChat} onChange={e => handleSearchChat(e.target.value)} />
+                                        <input className='form-control' type="text" placeholder={t('Chats')} value={qChat} onChange={e => handleSearchChat(e.target.value)} />
                                         <i data-eva="search" data-eva-hover="true" />
                                         <button className={`clear_button ${clearSearch ? 'show_clear' : ''}`} onClick={handleClearSearch}>×</button>
                                     </div>
@@ -237,7 +260,7 @@ export default function Chat() {
                                 </div>
                                 <div className={`main_chat_list content ${getActiveClass(2, "active-content")}`}>
                                     <div className="list_search">
-                                        <input value={qUser} className='form-control' type="text" placeholder='Contact' onChange={e => handleSearch(e.target.value)} />
+                                        <input value={qUser} className='form-control' type="text" placeholder={t('Contact')} onChange={e => handleSearch(e.target.value)} />
                                         <i data-eva="search" data-eva-hover="true" />
                                         <button className={`clear_button ${clearSearchUser ? 'show_clear' : ''}`} onClick={handleClearSearchUser}>×</button>
                                     </div>
