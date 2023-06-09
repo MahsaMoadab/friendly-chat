@@ -14,7 +14,7 @@ export const MessageBox = ({ message, user, handleJoinTiCall }) => {
 
   const onImageError = (e) => {
     e.target.src = Default;
-    // scrollRef.current?.scrollIntoView({ behavior: "smooth" })
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" })
   }
 
   return (
