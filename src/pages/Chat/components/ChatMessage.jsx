@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import SetNameProfile from './SetNameProfile'
-import { Button, Divider } from '@mui/material'
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Divider } from '@mui/material'
 import { useEffect } from 'react';
 import SendIcon from '../../../assets/images/send.svg'
 import { Timestamp, addDoc, collection, doc, updateDoc } from 'firebase/firestore';
@@ -14,6 +14,8 @@ import BackIcon from "../../../assets/images/icons/back.svg";
 import VideoIcon from "../../../assets/images/icons/video.svg";
 import Call from './Call';
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 const ChatMessage = ({ chat, messageList, closeChat }) => {
 
@@ -25,13 +27,25 @@ const ChatMessage = ({ chat, messageList, closeChat }) => {
     const user2 = chat.uid;
     const messageId = user1 > user2 ? `${user1 + user2}` : `${user2 + user1}`;
     const [call, setCall] = useState(false);
-    let lastCall = "";
+    let lastCall = messageList.at(-1);
     const scrollRef = useRef();
+    const { t } = useTranslation();
+    const [open, setOpen] = React.useState(false);
+    const [errAlert, setErrAlert] = useState('none')
+
+    const handleClickOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        setErrAlert('none');
+        setImg();
+    };
 
 
     useEffect(() => {
         setCall(false);
-        lastCall = messageList.at(-1);
         scrollRef.current?.scrollIntoView({ behavior: "smooth" })
     }, [chat, messageList]);
 
@@ -40,21 +54,13 @@ const ChatMessage = ({ chat, messageList, closeChat }) => {
         const fileType = file['type'];
         const validImageTypes = ['image/gif', 'image/jpeg', 'image/svg+xml', 'image/png', 'image/svgz', 'image/ico', 'image/tif'];
         if (!validImageTypes.includes(fileType)) {
-            console.log("no image");
+            setImg();
+            return toast.error(t('The uploaded file is not an image'))
         }
+        handleClickOpen()
     }
-    const sendMessageHandle = async (e) => {
-        e.preventDefault();
-        console.log(img);
-        console.log(text);
-        if (!text) return;
-        let url = '';
-        if (img) {
-            const imgRef = ref(userStorage, `images/${new Date().getTime()}-${img.name}`);
-            const snap = await uploadBytes(imgRef, img)
-            const dlurl = await getDownloadURL(ref(userStorage, snap.ref.fullPath));
-            url = dlurl;
-        }
+
+    const handleAddDoc = async (url, text)=>{
         await addDoc(collection(userDB, "messages", messageId, "chat"), {
             text: text || '',
             from: user1,
@@ -63,7 +69,56 @@ const ChatMessage = ({ chat, messageList, closeChat }) => {
             call: null,
             createdAt: Timestamp.fromDate(new Date()),
         });
+    }
 
+    const sendMessageHandleImg = async (e)=>{
+        e.preventDefault();
+        if (!text) return setErrAlert('flex');
+        setErrAlert('none');
+        let url = '';
+        if (img) {
+            const imgRef = ref(userStorage, `images/${new Date().getTime()}-${img.name}`);
+            const snap = await uploadBytes(imgRef, img)
+            const dlurl = await getDownloadURL(ref(userStorage, snap.ref.fullPath));
+            url = dlurl;
+        }
+        
+        await handleAddDoc(url, text);
+        const messageText = text;
+        setText('');
+
+        await updateDoc(doc(userDB, "userChats", user.uid), {
+            [messageId + ".date"]: Timestamp.fromDate(new Date()),
+            [messageId + ".unread"]: false,
+            [messageId + ".userInfo"]: {
+                name: chat.name,
+                uid: chat.uid,
+                avatar: chat.photoURL ? chat.photoURL : null,
+                text: messageText || '',
+                media: img ? img.name : '',
+                call: null,
+            },
+        });
+
+        await updateDoc(doc(userDB, "userChats", chat.uid), {
+            [messageId + ".date"]: Timestamp.fromDate(new Date()),
+            [messageId + ".unread"]: true,
+            [messageId + ".userInfo"]: {
+                name: user.displayName,
+                uid: user.uid,
+                avatar: user.photoURL ? user.photoURL : null,
+                text: messageText || '',
+                media: img ? img.name : '',
+                call: null,
+            },
+        });
+        handleClose();
+    }
+    const sendMessageHandle = async (e) => {
+        e.preventDefault();
+        if (!text) return;
+        let url = '';
+        await handleAddDoc(url, text);
         const messageText = text;
         setText('');
 
@@ -93,6 +148,7 @@ const ChatMessage = ({ chat, messageList, closeChat }) => {
             },
         });
         setImg();
+        lastCall = messageList.at(-1);
     }
 
     const handleVideoCall = async (e) => {
@@ -130,16 +186,23 @@ const ChatMessage = ({ chat, messageList, closeChat }) => {
                 call: "video",
             },
         });
+        lastCall = messageList.at(-1);
         setCall(true);
     }
 
     const handleJoinTiCall = () => {
-        console.log("calll");
         setCall(true);
     }
-    const handleCloseCall = () => {
-        console.log("calll ended");
-        lastCall = "";
+    const handleCloseCall = async () => {
+        lastCall = [];
+        await addDoc(collection(userDB, "messages", messageId, "chat"), {
+            text: '',
+            from: user1,
+            to: user2,
+            media: '',
+            call: 'endCall',
+            createdAt: Timestamp.fromDate(new Date()),
+        });
         setCall(false);
     }
     return (
@@ -155,7 +218,7 @@ const ChatMessage = ({ chat, messageList, closeChat }) => {
                             </div>
                             <div className='details'>
                                 <p className='username'>{chat.name}</p>
-                                <p className='last_active'>{chat.isOnline ? 'Online' : <>last active <Moment date={chat.lastActive.toDate()} format="LT" /></>}</p>
+                                <p className='last_active'>{chat.isOnline ? t('Online') : <>{t('last active')} <Moment className='time' date={chat.lastActive.toDate()} format="LT" /></>}</p>
                             </div>
                         </div>
                         <div className='message_header_action'>
@@ -174,26 +237,51 @@ const ChatMessage = ({ chat, messageList, closeChat }) => {
                                 }) :
                                 <div className='no_message'>
                                     <p>
-                                        No messages here yet...
+                                        {t('No messages here yet...')}
                                     </p>
                                 </div>
                         }
-                        
+
                         {
-                            lastCall && lastCall.call === 'video' ? <div className='message__content'><div ref={scrollRef} className={`message_box call ${lastCall.from === user.uid ? 'you' : ''}`}><button onClick={handleJoinTiCall}>Join to Call</button></div></div>  : ''
+                            lastCall && lastCall.call === 'video' ? <div className='message__content'><div ref={scrollRef} className={`message_box call ${lastCall.from === user.uid ? 'you' : ''}`}><button onClick={handleJoinTiCall}>{t('Join to Call')}</button></div></div> : ''
                         }
                     </div>
                     <Divider />
                     <form action="">
                         <div className='message_handler'>
-                            <div>
+                        <Dialog
+                            open={open}
+                            fullWidth={true}
+                            maxWidth="xs"
+                            onClose={handleClose}
+                            aria-labelledby="draggable-dialog-title"
+                        >
+                            <DialogTitle id="draggable-dialog-title">
+                                <span>{t('Send Image')}</span>
+                            </DialogTitle>
+                            <DialogContent className='dialog_contact'>
+                                <img width={'100%'} src={img ? URL.createObjectURL(img) : ''} alt="" />
+                                <div className='form_input'>
+                                    <input required value={text} onChange={e => setText(e.target.value)} placeholder={t('Type Caption')} />
+                                </div>
+                                <Alert style={{display: errAlert}} severity="error">{t('Fill in the image caption')}</Alert>
+                            </DialogContent>
+                            <DialogActions>
+                                <Button variant="outlined" style={{ margin: '0 0.5em' }} onClick={handleClose}>
+                                    {t('Cancel')}
+                                </Button>
+                                <Button color='primary' onClick={sendMessageHandleImg} variant="contained">{t('Send')}</Button>
+
+                            </DialogActions>
+                        </Dialog>
+                            <div className='attach'>
                                 <label htmlFor="attach">
                                     <img src={Attach} alt='' />
                                 </label>
                                 <input accept="image/*" onChange={e => handleAttach(e.target.files[0])} type="file" name='attach' id='attach' style={{ display: 'none' }} />
                             </div>
                             <div className='form_input'>
-                                <input value={text} onChange={e => setText(e.target.value)} placeholder='Type message...' />
+                                <input value={text} required onChange={e => setText(e.target.value)} placeholder={t('Type message...')} />
                                 <Button type='submit' onClick={sendMessageHandle}>
                                     <img src={SendIcon} alt="" />
                                 </Button>
@@ -201,10 +289,10 @@ const ChatMessage = ({ chat, messageList, closeChat }) => {
                         </div>
                     </form>
                 </div>
-                {call && 
-                <div className={`view_call join_call`}>
-                    <Call roomName={messageId} username={user.displayName} handleCloseCall={handleCloseCall}/>
-                </div>}
+                {call &&
+                    <div className={`view_call join_call`}>
+                        <Call roomName={messageId} username={user.displayName} handleCloseCall={handleCloseCall} />
+                    </div>}
             </div>
         </>
     )
