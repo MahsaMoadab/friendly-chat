@@ -11,7 +11,6 @@ body {
 
 body {
     background: $white;
-    font-family: 'Inter UI', sans-serif !important;
     font-size: 16px;
     font-weight: 600;
     line-height: 1.7;
@@ -20,6 +19,7 @@ body {
 
     * {
         transition: background 1s;
+        font-family: 'KalamehWeb' !important;
     }
 }
 
@@ -37,13 +37,13 @@ a {
     text-decoration: none;
 }
 
-/* Fonts  */
+/* Fonts */
 @font-face {
-    font-family: 'Inter UI';
+    font-family: 'KalamehWeb';
     font-style: normal;
     font-weight: 400;
-    src: url("../fonts/en/Inter-UI-Regular.woff2") format("woff2"),
-        url("../fonts/en/Inter-UI-Regular.woff") format("woff");
+    src: url("../fonts/fa/KalamehWeb-Regular.woff2") format("woff2"),
+        url("../fonts/fa/KalamehWeb-Regular.woff") format("woff");
 }
 
 .sign {
@@ -333,6 +333,7 @@ a {
                 width: 2em;
                 height: 2.5em;
             }
+
             .sidebar {
                 &_top {
                     display: flex;
@@ -446,12 +447,14 @@ a {
                         width: 1.5em;
                         height: 1.5em;
                         justify-content: center;
-                        align-items: center;
+                        align-items: stretch;
                         font-size: 1em;
                         cursor: pointer;
+
                         &:hover {
                             background: #0064cf;
                         }
+
                         &.show_clear {
                             display: flex;
                         }
@@ -558,6 +561,9 @@ a {
 
                                 @media (max-width: 992px) {
                                     width: 4.5em;
+                                }
+                                @media (max-width: 767px) {
+                                    width: 15.5em;
                                 }
                             }
                         }
@@ -705,7 +711,7 @@ a {
         justify-content: space-between;
         height: 100%;
 
-        &.hidden{
+        &.hidden {
             display: none;
         }
 
@@ -767,12 +773,13 @@ a {
                     }
                 }
 
-                .call_btn{
+                .call_btn {
                     background: unset;
                     cursor: pointer;
                     outline: unset;
                     border: unset;
                     transition: transform 0.8s ease-in-out;
+
                     img {
                         width: 3.3em;
 
@@ -849,6 +856,8 @@ a {
                 width: max-content;
                 color: #7E7979;
                 overflow-wrap: break-word;
+                margin-right: auto;
+                margin-left: unset;
 
                 @media (max-width:768px) {
                     max-width: 20em;
@@ -862,20 +871,24 @@ a {
                 p {
                     margin: 0;
                 }
+
                 &.you {
                     color: $white;
                     background: #0573EA;
                     border-radius: 17px 0px 17px 17px;
                     margin-left: auto;
+                    margin-right: unset;
                 }
-                &.call{
+
+                &.call {
                     border-radius: 17px;
                     width: 100%;
                     margin: 0 auto;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    button{
+
+                    button {
                         background: unset;
                         border: unset;
                         color: unset;
@@ -883,10 +896,10 @@ a {
                         font-weight: bold;
                         font-size: 1rem;
                         cursor: pointer;
-                        font-family: 'Inter UI';
                         padding: 0.5em;
                     }
-                    &:hover{
+
+                    &:hover {
                         box-shadow: 0px 0px 15px #00000075;
                     }
                 }
@@ -896,10 +909,11 @@ a {
                 font-size: 0.7em;
                 color: #8B8A8C;
                 padding: 0.2em 1em;
-
+                display: flex;
+                justify-content: flex-start;
                 &.you {
                     display: flex;
-                    justify-content: end;
+                    justify-content: flex-end;
                 }
             }
         }
@@ -924,13 +938,69 @@ a {
     text-overflow: ellipsis;
 }
 
+#jitsi-iframe {
+    iframe {
+        height: calc(100vh - 1.5em) !important;
+        border-radius: 0 2em 2em 0;
+
+        @media (max-width:767px) {
+            height: 100vh !important;
+            border-radius: 0;
+        }
+    }
+}
+
+.MuiDialogTitle-root+.css-ypiqx9-MuiDialogContent-root{
+    .form_input {
+        display: flex;
+        flex: 1;
+        background: #E8E8E8;
+        border-radius: 9px;
+        margin-bottom: 1em;
+    
+        input {
+            flex: 1;
+            padding: 1.2em;
+            width: max-content;
+            background: unset;
+            border: unset;
+            outline: unset;
+        }
+    }
+}
+
 body {
     &.dark {
         background: #161F2F;
 
         h2,
+        h4,
         span {
             color: $white;
+        }
+
+        .MuiDialogTitle-root+.css-ypiqx9-MuiDialogContent-root{
+            .form_input {
+                background: #041128;
+        
+                input {
+                    color: #a5a5a5;
+                }
+            }
+        }
+
+        .MuiSelect-select.MuiSelect-filled.MuiInputBase-input.MuiFilledInput-input.css-d9oaum-MuiSelect-select-MuiInputBase-input-MuiFilledInput-input {
+            color: #dbd1d1;
+        }
+
+        .css-hfutr2-MuiSvgIcon-root-MuiSelect-icon,
+        .css-bpeome-MuiSvgIcon-root-MuiSelect-icon {
+            color: #dbd1d1;
+        }
+
+        .css-1ka5eyc-MuiPaper-root-MuiMenu-paper-MuiPopover-paper {
+            background-color: #050a13;
+            color: #dbd1d1;
         }
 
         .css-twia2z-MuiPaper-root-MuiDialog-paper {
@@ -1146,22 +1216,93 @@ body {
             }
         }
     }
+
+    &.fa {
+        #jitsi-iframe {
+            iframe {
+                border-radius: 2em 0 0 2em;
+            }
+        }
+        .sign {
+            input {
+                direction: ltr !important;
+                text-align: left;
+
+                &::placeholder {
+                    direction: rtl !important;
+                    text-align: right;
+                }
+            }
+        }
+
+        .time {
+            direction: ltr !important;
+            text-align: left;
+            display: inline-block;
+        }
+
+
+        .list {
+            &_search {
+                .eva-hover {
+                    left: 4%;
+                    right: unset;
+                }
+
+                .clear_button {
+                    left: 4%;
+                    right: unset;
+                }
+
+                .form-control {
+                    padding: 0 15px 0 53px;
+                }
+            }
+        }
+
+        .css-hfutr2-MuiSvgIcon-root-MuiSelect-icon,
+        .css-bpeome-MuiSvgIcon-root-MuiSelect-icon {
+            left: 7px;
+            right: unset;
+            top: calc(50% - 0.5em);
+        }
+
+    }
+}
+h4 {
+    margin: 0.2em 0;
+}
+.img_lang {
+    width: 1.2em;
+}
+.MuiSelect-select.MuiSelect-filled.MuiInputBase-input.MuiFilledInput-input.css-d9oaum-MuiSelect-select-MuiInputBase-input-MuiFilledInput-input {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+.css-d9oaum-MuiSelect-select-MuiInputBase-input-MuiFilledInput-input {
+    padding-top: 0.7em !important;
 }
 
-.view_call{
+.css-1qdxojt-MuiButtonBase-root-MuiMenuItem-root {
+    display: flex;
+    gap: 0.5em;
+}
+.mobile_icon{
     display: none;
-    &.join_call{
+    @media (max-width: 767px) {
+        display: flex;
+    }
+}
+.view_call {
+    display: none;
+
+    &.join_call {
         display: block;
     }
 }
-
-#jitsi-iframe{
-    iframe{
-        height: calc(100vh - 1.5em) !important;
-        border-radius: 0 2em 2em 0;
-        @media (max-width:767px) {
-            height: 100vh !important;
-            border-radius: 0;
-        }
+.attach{
+    img{
+        cursor: pointer;
     }
 }
