@@ -24,7 +24,19 @@ const useDarkMode = () => {
         }
     }
 
-    return [theme, toggleTheme]
+    const chooseTheme = (choose) => {
+        if (choose === 'dark') {
+            window.localStorage.setItem('theme', 'dark');
+            setTheme('dark');
+            document.body.classList.add('dark');
+        } else {
+            window.localStorage.setItem('theme', 'light');
+            setTheme('light');
+            document.body.classList.remove('dark');
+        }
+    }
+
+    return [theme, toggleTheme, chooseTheme]
 }
 
 export default useDarkMode;
