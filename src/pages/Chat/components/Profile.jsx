@@ -119,7 +119,6 @@ const Profile = ({ user }) => {
         setOpen(false);
     };
 
-    console.log(lang);
     const [language, setLanguage] = useState(lang);
     const [changeTheme, setChangeTheme] = useState(theme);
 
