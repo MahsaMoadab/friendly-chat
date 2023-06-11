@@ -166,7 +166,7 @@ a {
 .main {
     &_app {
         width: 100%;
-        height: 100vh;
+        height: 100svh;
         background: $white;
         display: flex;
         align-items: center;
@@ -185,7 +185,7 @@ a {
         @media (max-width:767px) {
             flex-direction: column;
             width: 100%;
-            height: 100vh;
+            height: 100svh;
             border-radius: 0;
         }
 
@@ -351,8 +351,8 @@ a {
                         bottom: 6px;
                         left: 0;
                         right: 0;
-                        box-shadow: 0px -7px 17px #00000014;
-                        background: #f7f7f7;
+                        box-shadow: 0px -7px 9px #00000014;
+                        background: #e6e4f7;
                         border-radius: 1em;
                         margin: 0 auto;
                         p {
@@ -422,7 +422,7 @@ a {
                 width: -moz-available;
                 padding: 0 0.7em;
                 border-radius: 0;
-                background: #e5e4ea;
+                background: #fdfdfd;
             }
         }
 
@@ -1274,8 +1274,7 @@ body {
             }
         }
 
-        .css-hfutr2-MuiSvgIcon-root-MuiSelect-icon,
-        .css-bpeome-MuiSvgIcon-root-MuiSelect-icon {
+        .MuiSvgIcon-root {
             left: 7px;
             right: unset;
             top: calc(50% - 0.5em);
