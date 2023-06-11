@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 
 const useDarkMode = () => {
-    const [theme, setTheme] = useState('light');
+    const [theme, setTheme] = useState('dark');
 
     useEffect(() => {
         const localTheme = window.localStorage.getItem('theme');
-        if (localTheme === 'dark') {
+        if (localTheme === 'light') {
             setTheme(localTheme);
-            document.body.classList.add('dark');
+            document.body.classList.remove('dark');
         }
     }, []);
 
