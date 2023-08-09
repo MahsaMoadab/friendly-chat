@@ -217,7 +217,7 @@ const Profile = ({ user }) => {
                         </FormControl>
                     </div>
 
-                    <div style={{marginTop: '1em'}}>
+                    <div className='mobileChangetheme' style={{marginTop: '1em'}}>
                         <h4>{t('Choose theme')}</h4>
                         <FormControl fullWidth>
                             <Select
