@@ -870,7 +870,7 @@ a {
                 margin-left: unset;
 
                 @media (max-width:768px) {
-                    max-width: 20em;
+                    max-width: 17em;
                 }
 
                 img {
@@ -898,6 +898,10 @@ a {
                     align-items: center;
                     justify-content: center;
 
+                    @media (max-width:767px) {
+                        width: 80%;
+                    }
+
                     button {
                         background: unset;
                         border: unset;
@@ -907,6 +911,10 @@ a {
                         font-size: 1rem;
                         cursor: pointer;
                         padding: 0.5em;
+                        @media (max-width:767px) {
+                            width: 70%;
+                            font-size: 0.8rem;
+                        }
                     }
 
                     &:hover {
@@ -1332,5 +1340,12 @@ h4 {
 .attach{
     img{
         cursor: pointer;
+    }
+}
+
+.mobileChangetheme{
+    display: none;
+    @media (max-width: 767px) {
+        display: block;
     }
 }
